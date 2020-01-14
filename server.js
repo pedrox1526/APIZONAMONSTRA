@@ -3,7 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const requireDir = require('require-dir');
 const jwt = require("jsonwebtoken");
-const fs = require("fs")
+const fs = require("fs");
 
 
 
@@ -14,23 +14,34 @@ requireDir('./src/models');
 
 const app = express();
 
+var tokena = "";
 
 app.use(express.json());
 app.use(cors());
 
+
+
 app.get('/secret',isAuthenticated,(req,res)=>{
+    //("Authorization","Bearer "+tokena);
     res.json({"message":"Super Secret do not Share"});
+    console.log(tokena);
 })
 
 app.get('/readme',(req,res)=>{
     res.json({"message":"hello world"});
+    
 })
 
 app.get('/jwt', (req, res) => {
     let privateKey = fs.readFileSync('./src/private.pem', 'utf8');
-    let token = jwt.sign({ "body": "stuff" }, privateKey, { algorithm: 'HS256'});
-    res.send(token);
+    var token = jwt.sign({ "body": "stuff" }, privateKey, { algorithm: 'HS256'});
+    res.json(token);
+    tokena = token;
+
+   
 })
+
+
 
 function isAuthenticated(req, res, next) {
     if (typeof req.headers.authorization !== "undefined") {
